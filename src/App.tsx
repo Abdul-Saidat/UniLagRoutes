@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import "./App.css";
 import { DijkstraGraph } from "./algorithms/dijkstra";
+import CampusMap from "./components/CampusMap";
+import { buildGraph } from "./algorithms/buildGraph";
 
 const locations = [
   "Main Gate",
@@ -87,6 +89,7 @@ function App() {
         Find Route
       </button>
       <p> {path && path.join(" → ")} </p>
+      <CampusMap />
     </>
   );
 }
