@@ -66,6 +66,8 @@ export function buildGraph(geojson) {
 
             const distance = calculateDistance(currentCoordinate, nextCoordinate)
             graph.addEdge(currentNode, nextNode, distance)
+
+            // console.log(graph.numberOfNodes);
         }
     })
 

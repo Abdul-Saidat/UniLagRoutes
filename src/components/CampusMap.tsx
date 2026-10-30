@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, GeoJSON, Marker } from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON, Marker, Polyline } from "react-leaflet";
 
-function CampusMap() {
+type CampusMapProps = {
+    routeCoordinates: [number, number][]
+}
+
+function CampusMap({routeCoordinates}: CampusMapProps) {
   const [routeData, setRouteData] = useState(null);
 
   useEffect(() => {
@@ -9,6 +13,7 @@ function CampusMap() {
       .then((response) => response.json())
       .then((data) => {
         setRouteData(data);
+        console.log([...new Set(data.features.map((feature: any) => feature.geometry.type))]);
         (window as any).campusPaths = data;
 
         const highwayTypes = data.features.reduce(
@@ -20,10 +25,11 @@ function CampusMap() {
           {},
         );
 
-        console.table(highwayTypes);
+        // console.table(highwayTypes);
     })
       .catch((error) => console.error("Error loading paths:", error));
   }, []);
+//   console.log("Route coordinates:", routeCoordinates);
   return (
     <MapContainer
       center={[6.515, 3.39]}
@@ -35,8 +41,11 @@ function CampusMap() {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      {routeData && <GeoJSON data={routeData} />}
-      <Marker position={[6.51822, 3.39556]} />
+      {/* {routeData && <GeoJSON data={routeData} />} */}
+      {routeCoordinates.length > 0 && (
+        <Polyline positions={routeCoordinates} />
+      )}
+      {/* <Marker position={[6.51822, 3.39556]} /> */}
     </MapContainer>
   );
 }
