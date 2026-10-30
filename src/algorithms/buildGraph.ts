@@ -24,6 +24,31 @@ function calculateDistance(point1: number[], point2: number[]) {
 }
 (window as any).calculateDistance = calculateDistance;
 
+// Nearest-vertex lookup.
+// It receives a landmark's coordinates and returns the closest vertex in the road graph.
+
+export function findNearestVertex(landmarkCoordinates, graph) {
+    let minimumDistance = Infinity
+    let minimumVertex = ""
+
+    const keys = Object.keys(graph.adjacentList)
+
+    for (const vertex of keys) {
+        const originalVertex = vertex.split(",").map(Number)
+        const distance = calculateDistance(landmarkCoordinates, originalVertex)
+
+        if (distance < minimumDistance) {
+            minimumDistance = distance
+            minimumVertex = vertex
+        }
+    }
+
+    return minimumVertex
+
+}
+
+(window as any).findNearestVertex = findNearestVertex;
+
 export function buildGraph(geojson) {
     const graph = new DijkstraGraph()
     geojson.features.forEach((feature) => {
@@ -32,8 +57,19 @@ export function buildGraph(geojson) {
             const node = coordinate.join(",")
             graph.addVertex(node)
         })
-        for (let i = 0; i < coordinates.length(); i++) {
-            
+        for (let i = 0; i < coordinates.length - 1; i++) {
+            const currentCoordinate = coordinates[i]
+            const nextCoordinate = coordinates[i + 1]
+
+            const currentNode = currentCoordinate.join(",")
+            const nextNode = nextCoordinate.join(",")
+
+            const distance = calculateDistance(currentCoordinate, nextCoordinate)
+            graph.addEdge(currentNode, nextNode, distance)
         }
     })
+
+    return graph
 }
+
+(window as any).buildGraph = buildGraph;

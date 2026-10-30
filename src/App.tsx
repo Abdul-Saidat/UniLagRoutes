@@ -1,19 +1,41 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import { DijkstraGraph } from "./algorithms/dijkstra";
 import CampusMap from "./components/CampusMap";
-import { buildGraph } from "./algorithms/buildGraph";
+import { buildGraph, findNearestVertex } from "./algorithms/buildGraph";
+import { locations } from "./data/locations";
 
-const locations = [
-  "Main Gate",
-  "Faculty of Science",
-  "J.F. Ade Ajayi Auditorium",
-];
+// const locations = [
+//   "Main Gate",
+//   "Faculty of Science",
+//   "J.F. Ade Ajayi Auditorium",
+// ];
+
 
 function App() {
   const [startingPoint, setStartingPoint] = useState("");
   const [destination, setDestination] = useState("");
   const [path, setPath] = useState<string[] | null>(null);
+  const [fullgraph, setFullGraph] = useState<DijkstraGraph | null>(null)
+
+  useEffect(() => {
+      fetch("/data/unilag-paths.geojson")
+      .then((response) => response.json())
+      .then((data) => {
+        const newGraph = buildGraph(data)
+        setFullGraph(newGraph)
+        console.log(newGraph.numberOfNodes);
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+      
+  
+  }, [])
+
+  function handleSubmit() {
+    
+  }
 
   const graph = useMemo(() => {
     const addNode = new DijkstraGraph();
@@ -63,9 +85,9 @@ function App() {
       >
         <option value="" disabled>Select starting point</option>
         {locations.map((location) => (
-          <option key={location} value={location}>
+          <option key={location.id} value={location.name}>
             {" "}
-            {location}{" "}
+            {location.name}{" "}
           </option>
         ))}
       </select>
@@ -78,9 +100,9 @@ function App() {
         onChange={(e) => setDestination(e.target.value)}
       >
         {locations.map((location) => (
-          <option key={location} value={location}>
+          <option key={location.id} value={location.name}>
             {" "}
-            {location}{" "}
+            {location.name}{" "}
           </option>
         ))}
       </select>

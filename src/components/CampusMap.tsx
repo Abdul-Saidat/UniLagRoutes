@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON, Marker } from "react-leaflet";
 
 function CampusMap() {
   const [routeData, setRouteData] = useState(null);
@@ -36,6 +36,7 @@ function CampusMap() {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {routeData && <GeoJSON data={routeData} />}
+      <Marker position={[6.51822, 3.39556]} />
     </MapContainer>
   );
 }
