@@ -19,6 +19,7 @@ function App() {
   const [routeCoordinates, setRouteCoordinates] = useState<[number, number][]>(
     [],
   );
+  const [totalDistance, setTotalDistance] = useState<number | null>(null)
 
   useEffect(() => {
     fetch("/data/unilag-paths.geojson")
@@ -61,6 +62,7 @@ function App() {
         console.log("destination vertex", destinationVertex);
 
         fullgraph.dijkstra(startVertex);
+        setTotalDistance(fullgraph.distance[destinationVertex])
         const reachable = Object.keys(fullgraph.distance).filter(
           (v) => fullgraph.distance[v] !== Infinity,
         );
@@ -150,6 +152,11 @@ function App() {
         Find Route
       </button>
       {/* {path && path.join(" → ")}  */}
+      <div>
+        <h3 className="font-bold text-2xl">Result</h3>
+        <p> {startingPoint} → {destination}  </p>
+        <p>Distance: {totalDistance !== null ? `${(totalDistance / 1000).toFixed(2)} km ` : "_"}</p>
+      </div>
       <CampusMap routeCoordinates={routeCoordinates} />
     </>
   );
