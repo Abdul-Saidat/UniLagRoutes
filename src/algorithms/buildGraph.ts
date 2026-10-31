@@ -50,28 +50,28 @@ export function findNearestVertex(landmarkCoordinates, graph) {
 
 (window as any).findNearestVertex = findNearestVertex;
 export function buildGraph(geojson) {
-  const graph = new DijkstraGraph()
+    const graph = new DijkstraGraph()
 
-  const features = geojson.features.filter(
-    (f) => f.geometry && f.geometry.type === "LineString"
-  )
+    const features = geojson.features.filter(
+        (f) => f.geometry && f.geometry.type === "LineString"
+    )
 
-  features.forEach((feature) => {
-    const coords: number[][] = feature.geometry.coordinates
+    features.forEach((feature) => {
+        const coords: number[][] = feature.geometry.coordinates
 
-    // make sure every point exists as a vertex
-    coords.forEach((c) => graph.addVertex(c.join(",")))
+        // make sure every point exists as a vertex
+        coords.forEach((c) => graph.addVertex(c.join(",")))
 
-    // connect consecutive points
-    for (let i = 0; i < coords.length - 1; i++) {
-      const a = coords[i]
-      const b = coords[i + 1]
-      graph.addEdge(a.join(","), b.join(","), calculateDistance(a, b))
-    }
-  })
+        // connect consecutive points
+        for (let i = 0; i < coords.length - 1; i++) {
+            const a = coords[i]
+            const b = coords[i + 1]
+            graph.addEdge(a.join(","), b.join(","), calculateDistance(a, b))
+        }
+    })
 
-  console.log("Total vertices:", Object.keys(graph.adjacentList).length)
-  return graph
+    console.log("Total vertices:", Object.keys(graph.adjacentList).length)
+    return graph
 }
 
 (window as any).buildGraph = buildGraph

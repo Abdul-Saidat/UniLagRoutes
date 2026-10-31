@@ -1,11 +1,17 @@
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, GeoJSON, Marker, Polyline } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  // GeoJSON,
+  // Marker,
+  Polyline,
+} from "react-leaflet";
 
 type CampusMapProps = {
-    routeCoordinates: [number, number][]
-}
+  routeCoordinates: [number, number][];
+};
 
-function CampusMap({routeCoordinates}: CampusMapProps) {
+function CampusMap({ routeCoordinates }: CampusMapProps) {
   const [routeData, setRouteData] = useState(null);
 
   useEffect(() => {
@@ -13,11 +19,15 @@ function CampusMap({routeCoordinates}: CampusMapProps) {
       .then((response) => response.json())
       .then((data) => {
         setRouteData(data);
-        console.log([...new Set(data.features.map((feature: any) => feature.geometry.type))]);
+        console.log([
+          ...new Set(
+            data.features.map((feature: any) => feature.geometry.type),
+          ),
+        ]);
         (window as any).campusPaths = data;
 
         const highwayTypes = data.features.reduce(
-            (counts: Record<string, number>, feature) => {
+          (counts: Record<string, number>, feature) => {
             const type = feature.properties.highway;
             counts[type] = (counts[type] || 0) + 1;
             return counts;
@@ -26,10 +36,10 @@ function CampusMap({routeCoordinates}: CampusMapProps) {
         );
 
         // console.table(highwayTypes);
-    })
+      })
       .catch((error) => console.error("Error loading paths:", error));
   }, []);
-//   console.log("Route coordinates:", routeCoordinates);
+  //   console.log("Route coordinates:", routeCoordinates);
   return (
     <MapContainer
       center={[6.515, 3.39]}
@@ -42,9 +52,7 @@ function CampusMap({routeCoordinates}: CampusMapProps) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {/* {routeData && <GeoJSON data={routeData} />} */}
-      {routeCoordinates.length > 0 && (
-        <Polyline positions={routeCoordinates} />
-      )}
+      {routeCoordinates.length > 0 && <Polyline positions={routeCoordinates} />}
       {/* <Marker position={[6.51822, 3.39556]} /> */}
     </MapContainer>
   );

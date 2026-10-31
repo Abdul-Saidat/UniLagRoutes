@@ -34,20 +34,18 @@ function App() {
   }, []);
 
   function handleSubmit() {
-    console.log("clicked", { startingPoint, destination, graphReady: fullgraph !== null})
+    console.log("clicked", {
+      startingPoint,
+      destination,
+      graphReady: fullgraph !== null,
+    });
     if (fullgraph !== null) {
-      // console.log("full graph", fullgraph);
-
       const startingLocation = locations.find(
         (location) => location.name === startingPoint,
       );
-      // console.log("starting location", startingLocation);
-
       const destinationLocation = locations.find(
         (location) => location.name === destination,
       );
-      // console.log("destination location", destinationLocation);
-
       if (startingLocation && destinationLocation) {
         const startVertex = findNearestVertex(
           startingLocation.coordinates,
@@ -72,12 +70,6 @@ function App() {
           "of",
           Object.keys(fullgraph.adjacentList).length,
         );
-        // const reachableVertices = Object.values(fullgraph.visited).filter(
-        //   Boolean,
-        // ).length;
-
-        // console.log("Reachable vertices from CITS:", reachableVertices);
-        // console.log("Total graph vertices:", fullgraph.numberOfNodes);
         console.log(
           "Can reach New Hall:",
           fullgraph.visited[destinationVertex],
@@ -87,13 +79,8 @@ function App() {
           "Destination connections:",
           fullgraph.adjacentList[destinationVertex],
         );
-        // console.log("Start distance:", fullgraph.distance[startVertex]);
-        // console.log("Destination distance:", fullgraph.distance[destinationVertex]);
         console.log("Shortest path:", fullgraph.getPath(destinationVertex));
-        // console.log("",fullgraph.distance[destinationVertex]);
         const shortestPath = fullgraph.getPath(destinationVertex);
-        // console.log("shortest path", shortestPath);
-        // console.log(fullgraph.adjacentList[startVertex]);
         console.log(fullgraph.adjacentList[destinationVertex]);
         if (shortestPath !== null) {
           const shortestRoute: [number, number][] = [];
@@ -112,47 +99,52 @@ function App() {
 
   return (
     <>
-      <h1>UnilagRoutes</h1>
-      <p>
-        Input your current destination and final destination to get an overview
-        of the distance and route to your destination.
-      </p>
+      <section>
+        <h1 className="font-bold text-xl md:text-3xl">UnilagRoutes</h1>
+        <p>Shortest walking route between campus spots</p>
+      </section>
 
-      <label htmlFor="startingPoint">Select starting point</label>
-      <select
-        name="startingPoint"
-        id="startingPoint"
-        value={startingPoint}
-        onChange={(e) => setStartingPoint(e.target.value)}
-      >
-        <option value="" disabled>
-          Select starting point
-        </option>
-        {locations.map((location) => (
-          <option key={location.id} value={location.name}>
-            {" "}
-            {location.name}{" "}
-          </option>
-        ))}
-      </select>
-
-      <label htmlFor="destination">Select destination</label>
-      <select
-        name="destination"
-        id="destination"
-        value={destination}
-        onChange={(e) => setDestination(e.target.value)}
-      >
-        <option value="" disabled>
-          Select destination
-        </option>
-        {locations.map((location) => (
-          <option key={location.id} value={location.name}>
-            {" "}
-            {location.name}{" "}
-          </option>
-        ))}
-      </select>
+      <section className="flex flex-col gap-2">
+        <h2 className="font-bold text-2xl">Where to?</h2>
+        <div className="flex flex-col">
+          <label htmlFor="startingPoint">From</label>
+          <select
+            name="startingPoint"
+            id="startingPoint"
+            value={startingPoint}
+            onChange={(e) => setStartingPoint(e.target.value)}
+          >
+            <option value="" disabled>
+              Select starting point
+            </option>
+            {locations.map((location) => (
+              <option key={location.id} value={location.name}>
+                {" "}
+                {location.name}{" "}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor="destination">To</label>
+          <select
+            name="destination"
+            id="destination"
+            value={destination}
+            onChange={(e) => setDestination(e.target.value)}
+          >
+            <option value="" disabled>
+              Select destination
+            </option>
+            {locations.map((location) => (
+              <option key={location.id} value={location.name}>
+                {" "}
+                {location.name}{" "}
+              </option>
+            ))}
+          </select>
+        </div>
+      </section>
 
       <button type="button" onClick={() => handleSubmit()}>
         Find Route
