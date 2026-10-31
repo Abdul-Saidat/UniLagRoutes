@@ -14,7 +14,7 @@ import { locations } from "./data/locations";
 function App() {
   const [startingPoint, setStartingPoint] = useState("");
   const [destination, setDestination] = useState("");
-  const [path, setPath] = useState<string[] | null>(null);
+  // const [path, setPath] = useState<string[] | null>(null);
   const [fullgraph, setFullGraph] = useState<DijkstraGraph | null>(null);
   const [routeCoordinates, setRouteCoordinates] = useState<[number, number][]>(
     [],
@@ -34,19 +34,19 @@ function App() {
   }, []);
 
   function handleSubmit() {
+    console.log("clicked", { startingPoint, destination, graphReady: fullgraph !== null})
     if (fullgraph !== null) {
       // console.log("full graph", fullgraph);
-      
+
       const startingLocation = locations.find(
         (location) => location.name === startingPoint,
       );
       // console.log("starting location", startingLocation);
-      
+
       const destinationLocation = locations.find(
         (location) => location.name === destination,
       );
       // console.log("destination location", destinationLocation);
-      
 
       if (startingLocation && destinationLocation) {
         const startVertex = findNearestVertex(
@@ -54,7 +54,7 @@ function App() {
           fullgraph,
         );
         console.log("start vertex", startVertex);
-        
+
         const destinationVertex = findNearestVertex(
           destinationLocation.coordinates,
           fullgraph,
@@ -62,19 +62,47 @@ function App() {
 
         console.log("destination vertex", destinationVertex);
 
-
         fullgraph.dijkstra(startVertex);
+        const reachable = Object.keys(fullgraph.distance).filter(
+          (v) => fullgraph.distance[v] !== Infinity,
+        );
+        console.log(
+          "Reachable:",
+          reachable.length,
+          "of",
+          Object.keys(fullgraph.adjacentList).length,
+        );
+        // const reachableVertices = Object.values(fullgraph.visited).filter(
+        //   Boolean,
+        // ).length;
+
+        // console.log("Reachable vertices from CITS:", reachableVertices);
+        // console.log("Total graph vertices:", fullgraph.numberOfNodes);
+        console.log(
+          "Can reach New Hall:",
+          fullgraph.visited[destinationVertex],
+        );
+        console.log("Start connections:", fullgraph.adjacentList[startVertex]);
+        console.log(
+          "Destination connections:",
+          fullgraph.adjacentList[destinationVertex],
+        );
+        // console.log("Start distance:", fullgraph.distance[startVertex]);
+        // console.log("Destination distance:", fullgraph.distance[destinationVertex]);
         console.log("Shortest path:", fullgraph.getPath(destinationVertex));
-        console.log(fullgraph.distance[destinationVertex]);
+        // console.log("",fullgraph.distance[destinationVertex]);
         const shortestPath = fullgraph.getPath(destinationVertex);
         // console.log("shortest path", shortestPath);
-        console.log(fullgraph.adjacentList[startVertex]);
-console.log(fullgraph.adjacentList[destinationVertex]);
+        // console.log(fullgraph.adjacentList[startVertex]);
+        console.log(fullgraph.adjacentList[destinationVertex]);
         if (shortestPath !== null) {
-          const shortestRoute = [];
+          const shortestRoute: [number, number][] = [];
           for (const path of shortestPath) {
-            const coordinateArr = path.split(",").map(Number) as [number, number];
-            shortestRoute.push(coordinateArr);
+            const coordinateArr = path.split(",").map(Number) as [
+              number,
+              number,
+            ];
+            shortestRoute.push([coordinateArr[1], coordinateArr[0]]);
           }
           setRouteCoordinates(shortestRoute);
         }
@@ -82,39 +110,6 @@ console.log(fullgraph.adjacentList[destinationVertex]);
     }
   }
 
-  // reverse the order when pushing into shortestRoute for Leaflet:
-  // shortestRoute.push([coordinateArr[1], coordinateArr[0]]);
-
-  // const graph = useMemo(() => {
-  //   const addNode = new DijkstraGraph();
-  //   addNode.addVertex("Main Gate");
-  //   addNode.addVertex("Faculty of Science");
-  //   addNode.addVertex("J.F. Ade Ajayi Auditorium");
-
-  //   addNode.addEdge("Main Gate", "Faculty of Science", 300); // The weight 300 represents the distance between Main Gate and Faculty of Science.
-  //   addNode.addEdge("Faculty of Science", "J.F. Ade Ajayi Auditorium", 900);
-
-  //   addNode.dijkstra("Main Gate"); // This tells Dijkstra's algorithm to calculate the shortest distances from Main Gate to every other reachable vertex in the graph.
-
-  //   return addNode;
-  // }, []);
-  // function findRoute() {
-  //   console.log("Find Route clicked!");
-
-  //   console.log("Starting point:", startingPoint);
-  //   console.log("Destination:", destination);
-
-  //   graph.dijkstra(startingPoint);
-  //   const pathway = graph.getPath(destination);
-  //   console.log(pathway);
-  //   setPath(pathway);
-  // }
-
-  // const graph = useMemo(() => {
-  //   let addNode = new DijkstraGraph();
-  //   addNode.addVertex("Main")
-  //   return addNode
-  //   , []})  // useMemo() -> caches a value between renders. () => new DijkstraGraph() creates the graph instance. [] - tells React that the memoized value has no dependencies.
   return (
     <>
       <h1>UnilagRoutes</h1>
@@ -148,6 +143,9 @@ console.log(fullgraph.adjacentList[destinationVertex]);
         value={destination}
         onChange={(e) => setDestination(e.target.value)}
       >
+        <option value="" disabled>
+          Select destination
+        </option>
         {locations.map((location) => (
           <option key={location.id} value={location.name}>
             {" "}
@@ -159,8 +157,8 @@ console.log(fullgraph.adjacentList[destinationVertex]);
       <button type="button" onClick={() => handleSubmit()}>
         Find Route
       </button>
-      <p> {path && path.join(" → ")} </p>
-      <CampusMap routeCoordinates = {routeCoordinates} />
+      {/* {path && path.join(" → ")}  */}
+      <CampusMap routeCoordinates={routeCoordinates} />
     </>
   );
 }

@@ -31,48 +31,83 @@ export class DijkstraGraph {
     }
 
     // this method answers: what is the shortest distance from the starting node to every other node, and which node came before each one?
+    // dijkstra(startNode: string) {
+    //     const allNodes = Object.keys(this.adjacentList)
+    //     for (const node of allNodes) {
+    //         if (node == startNode) {
+    //             this.distance[node] = 0
+    //             this.previous[node] = null
+    //             this.visited[node] = false
+    //         } else {
+    //             this.distance[node] = Infinity
+    //             this.previous[node] = null
+    //             this.visited[node] = false
+    //         }
+    //     }
+
+    //     while (Object.values(this.visited).some(value => value === false)) {
+    //         let currentNode = ""
+    //         for (const node of allNodes) {
+    //             if (this.visited[node] == false) {
+    //                 if (!currentNode) {
+    //                     currentNode = node
+    //                 } else if (this.distance[node] < this.distance[currentNode]) {
+    //                     currentNode = node
+    //                 }
+    //             }
+    //         }
+    //         if (this.distance[currentNode] === Infinity) {
+    //             break
+    //         } else {
+    //             for (const neighbour of this.adjacentList[currentNode]) {
+    //                 if (!this.visited[neighbour.node]) {
+    //                     const candidate = this.distance[currentNode] + neighbour.weight
+    //                     if (candidate < this.distance[neighbour.node]) {
+    //                         this.distance[neighbour.node] = candidate
+    //                         this.previous[neighbour.node] = currentNode
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //         this.visited[currentNode] = true
+    //     }
+    // }
+
     dijkstra(startNode: string) {
         const allNodes = Object.keys(this.adjacentList)
         for (const node of allNodes) {
-            if (node == startNode) {
-                this.distance[node] = 0
-                this.previous[node] = null
-                this.visited[node] = false
-            } else {
-                this.distance[node] = Infinity
-                this.previous[node] = null
-                this.visited[node] = false
-            }
+            this.distance[node] = node === startNode ? 0 : Infinity
+            this.previous[node] = null
+            this.visited[node] = false
         }
 
-        while (Object.values(this.visited).some(value => value === false)) {
+        const frontier = new Set<string>([startNode])
+
+        while (frontier.size > 0) {
+            // pick the frontier node with the smallest distance
             let currentNode = ""
-            for (const node of allNodes) {
-                if (this.visited[node] == false) {
-                    if (!currentNode) {
-                        currentNode = node
-                    } else if (this.distance[node] < this.distance[currentNode]) {
-                        currentNode = node
-                    }
+            let best = Infinity
+            for (const node of frontier) {
+                if (this.distance[node] < best) {
+                    best = this.distance[node]
+                    currentNode = node
                 }
             }
-            if (this.distance[currentNode] === Infinity) {
-                break
-            } else {
-                for (const neighbour of this.adjacentList[currentNode]) {
-                    if (!this.visited[neighbour.node]) {
-                        const candidate = this.distance[currentNode] + neighbour.weight
-                        if (candidate < this.distance[neighbour.node]) {
-                            this.distance[neighbour.node] = candidate
-                            this.previous[neighbour.node] = currentNode
-                        }
-                    }
-                }
-            }
+
+            frontier.delete(currentNode)
             this.visited[currentNode] = true
+
+            for (const neighbour of this.adjacentList[currentNode]) {
+                if (this.visited[neighbour.node]) continue
+                const candidate = best + neighbour.weight
+                if (candidate < this.distance[neighbour.node]) {
+                    this.distance[neighbour.node] = candidate
+                    this.previous[neighbour.node] = currentNode
+                    frontier.add(neighbour.node)
+                }
+            }
         }
     }
-
 
     // takes the destination and follows previous backwards
     getPath(destinationNode: string): string[] | null {
