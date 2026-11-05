@@ -45,7 +45,8 @@ function CampusMap({ routeCoordinates }: CampusMapProps) {
       center={[6.515, 3.39]}
       zoom={16}
       scrollWheelZoom={true}
-      style={{ height: "70vh", width: "100%" }}
+      style={{ height: "100%", width: "100%" }}
+      // className="absolute"
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
